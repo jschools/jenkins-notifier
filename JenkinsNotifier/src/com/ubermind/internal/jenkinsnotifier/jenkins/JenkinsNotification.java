@@ -1,5 +1,7 @@
 package com.ubermind.internal.jenkinsnotifier.jenkins;
 
+import java.util.Date;
+
 import com.google.api.client.util.DateTime;
 import com.google.api.client.util.Key;
 import com.google.api.client.util.Value;
@@ -72,7 +74,7 @@ public class JenkinsNotification {
 		entity.setProperty(DsKey.NUMBER, Integer.valueOf(getNumber()));
 		entity.setUnindexedProperty(DsKey.PHASE, getPhase());
 		entity.setProperty(DsKey.STATUS, getStatus().name());
-		entity.setProperty(DsKey.TIMESTAMP, getTimestamp());
+		entity.setProperty(DsKey.TIMESTAMP, new Date(getTimestamp().getValue()));
 	}
 
 	public static class BuildResult {

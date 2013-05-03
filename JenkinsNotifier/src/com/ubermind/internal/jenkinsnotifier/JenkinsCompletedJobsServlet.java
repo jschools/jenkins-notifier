@@ -18,6 +18,9 @@ import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.EntityNotFoundException;
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
+import com.google.appengine.api.taskqueue.Queue;
+import com.google.appengine.api.taskqueue.QueueFactory;
+import com.google.appengine.api.taskqueue.TaskOptions;
 import com.ubermind.internal.jenkinsnotifier.jenkins.JenkinsNotification;
 
 @SuppressWarnings("serial")
@@ -87,6 +90,12 @@ public class JenkinsCompletedJobsServlet extends HttpServlet {
 		Entity buildEntity = new Entity(DsConst.KIND_BUILD, job.getKey());
 		buildInfo.populateProperties(buildEntity);
 		datastore.put(buildEntity);
+
+		// enqueue a notifier task
+		Queue queue = QueueFactory.getDefaultQueue();
+		TaskOptions options = TaskOptions.Builder.withUrl(NotifyConstants.URL)
+				.param("key", KeyFactory.keyToString(buildEntity.getKey()));
+		queue.add(options);
 	}
 
 	private static Key getAllJobsKey() {
@@ -113,5 +122,9 @@ public class JenkinsCompletedJobsServlet extends HttpServlet {
 		public static final String KIND_BUILD = "build";
 
 		public static final String PROP_JOB_NAME = "name";
+	}
+
+	private static interface NotifyConstants {
+		public static final String URL = "/notifySubscribers";
 	}
 }
