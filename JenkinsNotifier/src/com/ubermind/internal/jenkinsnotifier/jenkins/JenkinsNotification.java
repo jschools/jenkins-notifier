@@ -1,5 +1,6 @@
 package com.ubermind.internal.jenkinsnotifier.jenkins;
 
+import com.google.api.client.util.DateTime;
 import com.google.api.client.util.Key;
 import com.google.api.client.util.Value;
 import com.google.appengine.api.datastore.Entity;
@@ -11,6 +12,8 @@ public class JenkinsNotification {
 
 	@Key(Json.BUILD_RESULT)
 	private BuildResult buildResult;
+
+	private DateTime timestamp;
 
 	public JenkinsNotification() {
 		// default constructor
@@ -56,11 +59,20 @@ public class JenkinsNotification {
 		buildResult.status = status;
 	}
 
+	public DateTime getTimestamp() {
+		return timestamp;
+	}
+
+	public void setTimestamp(DateTime timestamp) {
+		this.timestamp = timestamp;
+	}
+
 	public void populateProperties(Entity entity) {
 		entity.setUnindexedProperty(DsKey.FULL_URL, getFullUrl());
 		entity.setProperty(DsKey.NUMBER, Integer.valueOf(getNumber()));
 		entity.setUnindexedProperty(DsKey.PHASE, getPhase());
 		entity.setProperty(DsKey.STATUS, getStatus().name());
+		entity.setProperty(DsKey.TIMESTAMP, getTimestamp());
 	}
 
 	public static class BuildResult {
@@ -99,6 +111,7 @@ public class JenkinsNotification {
 		public static final String NUMBER = "number";
 		public static final String PHASE = "phase";
 		public static final String STATUS = "status";
+		public static final String TIMESTAMP = "timestamp";
 	}
 
 	public static interface Json {

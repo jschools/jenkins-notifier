@@ -15,12 +15,9 @@ import com.google.api.client.util.DateTime;
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.Entity;
+import com.google.appengine.api.datastore.EntityNotFoundException;
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
-import com.google.appengine.api.datastore.Query;
-import com.google.appengine.api.datastore.Query.Filter;
-import com.google.appengine.api.datastore.Query.FilterOperator;
-import com.google.appengine.api.datastore.Query.FilterPredicate;
 import com.ubermind.internal.jenkinsnotifier.jenkins.JenkinsNotification;
 
 @SuppressWarnings("serial")
@@ -52,27 +49,31 @@ public class JenkinsCompletedJobsServlet extends HttpServlet {
 
 	@Override
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+		DateTime requestTimestamp = new DateTime(new Date().getTime(), 0);
+
 		JsonFactory f = new JacksonFactory();
 		JenkinsNotification buildInfo = f.fromReader(req.getReader(), JenkinsNotification.class);
-
-		DateTime date = new DateTime(new Date().getTime(), 0);
-		String formattedDate = date.toStringRfc3339();
+		buildInfo.setTimestamp(requestTimestamp);
 
 		resp.setContentType(DsConst.CONTENT_TYPE_PLAINTEXT);
 		PrintWriter writer = resp.getWriter();
 		writer.printf("Job: %s\n", buildInfo.getJobName());
 		writer.printf("Build number: %d\n", Integer.valueOf(buildInfo.getNumber()));
 		writer.printf("Status: %s\n", buildInfo.getStatus().name());
-		writer.printf("Timestamp: %s\n", formattedDate);
+		writer.printf("Timestamp: %s\n", requestTimestamp.toStringRfc3339());
 		writer.printf("URL: %s", buildInfo.getFullUrl());
 
 		// get datastore
 		DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
 
 		// get the previous job
-		Filter jobFilter = new FilterPredicate(DsConst.PROP_JOB_NAME, FilterOperator.EQUAL, buildInfo.getJobName());
-		Query jobQuery = new Query(DsConst.KIND_JOB).setKeysOnly().setFilter(jobFilter);
-		Entity job = datastore.prepare(jobQuery).asSingleEntity();
+		Entity job;
+		try {
+			job = datastore.get(getJobKey(buildInfo.getJobName()));
+		}
+		catch (EntityNotFoundException e) {
+			job = null;
+		}
 
 		// insert a new one if necessary
 		if (job == null) {
