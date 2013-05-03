@@ -1,0 +1,10 @@
+<!-- Indices written at Thu, 2 May 2013 15:55:18 PDT -->
+
+<datastore-indexes>
+
+    <!-- Used 1 time in query history -->
+    <datastore-index kind="completed_build" ancestor="true" source="auto">
+        <property name="fullDisplayName" direction="asc"/>
+    </datastore-index>
+
+</datastore-indexes>
