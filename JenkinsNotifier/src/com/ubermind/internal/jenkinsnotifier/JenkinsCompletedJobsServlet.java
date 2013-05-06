@@ -102,6 +102,7 @@ public class JenkinsCompletedJobsServlet extends HttpServlet {
 		return KeyFactory.createKey(getAllJobsKey(), DsConst.KIND_JOB, jobName);
 	}
 
+	@SuppressWarnings("unused")
 	private static Key getBuildKey(String jobName, int buildNumber) {
 		return KeyFactory.createKey(DsConst.KIND_BUILD, String.format("%s.%04d", jobName, Integer.valueOf(buildNumber)));
 	}
