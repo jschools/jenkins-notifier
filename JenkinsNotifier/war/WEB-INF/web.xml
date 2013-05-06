@@ -24,12 +24,12 @@ http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
 	</servlet-mapping>
 
 	<servlet>
-		<servlet-name>JenkinsCompletedJobs</servlet-name>
-		<servlet-class>com.ubermind.internal.jenkinsnotifier.JenkinsCompletedJobsServlet</servlet-class>
+		<servlet-name>completedBuilds</servlet-name>
+		<servlet-class>com.ubermind.internal.jenkinsnotifier.CompletedBuildsServlet</servlet-class>
 	</servlet>
 	<servlet-mapping>
-		<servlet-name>JenkinsCompletedJobs</servlet-name>
-		<url-pattern>/completedJobs</url-pattern>
+		<servlet-name>completedBuilds</servlet-name>
+		<url-pattern>/completedBuilds</url-pattern>
 	</servlet-mapping>
 
 	<servlet>

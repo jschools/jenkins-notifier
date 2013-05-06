@@ -1,4 +1,4 @@
-package com.ubermind.internal.jenkinsnotifier;
+package com.ubermind.internal.jenkinsnotifier.util;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -58,13 +58,18 @@ public class AuthUtil {
 		session.setAttribute(SessionVars.USER_ID, userId);
 	}
 
-	public static void clearUserId(HttpServletRequest request) throws IOException {
+	public static void logOut(HttpServletRequest request) throws IOException {
+		// Remove their ID from the local session
+		request.getSession().removeAttribute(SessionVars.USER_ID);
+	}
+
+	public static void deAuth(HttpServletRequest request) throws IOException {
+		// log the user out
+		logOut(request);
+
 		// Delete the credential in the credential store
 		String userId = getUserId(request);
 		getCredentialStore().delete(userId, getCredential(userId));
-
-		// Remove their ID from the local session
-		request.getSession().removeAttribute(SessionVars.USER_ID);
 	}
 
 	public static Credential getCredential(String userId) throws IOException {

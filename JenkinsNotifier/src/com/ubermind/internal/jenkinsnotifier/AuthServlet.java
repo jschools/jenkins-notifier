@@ -11,6 +11,8 @@ import com.google.api.client.auth.oauth2.AuthorizationCodeFlow;
 import com.google.api.client.auth.oauth2.TokenResponse;
 import com.google.api.client.googleapis.auth.oauth2.GoogleTokenResponse;
 import com.google.api.client.http.GenericUrl;
+import com.ubermind.internal.jenkinsnotifier.util.AuthUtil;
+import com.ubermind.internal.jenkinsnotifier.util.WebUtil;
 
 @SuppressWarnings("serial")
 public class AuthServlet extends HttpServlet {

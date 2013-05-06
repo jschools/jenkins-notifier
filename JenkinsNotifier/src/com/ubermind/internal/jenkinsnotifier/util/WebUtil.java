@@ -1,4 +1,4 @@
-package com.ubermind.internal.jenkinsnotifier;
+package com.ubermind.internal.jenkinsnotifier.util;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
