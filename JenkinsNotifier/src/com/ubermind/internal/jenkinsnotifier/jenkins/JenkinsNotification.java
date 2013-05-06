@@ -69,7 +69,18 @@ public class JenkinsNotification {
 		this.timestamp = timestamp;
 	}
 
+	public JenkinsNotification(Entity entity) {
+		this.jobName = (String) entity.getProperty(DsKey.JOB_NAME);
+		buildResult = new BuildResult();
+		buildResult.fullUrl = (String) entity.getProperty(DsKey.FULL_URL);
+		buildResult.number = getEntityInt(DsKey.NUMBER, entity, BuildResult.UNKNOWN_INT);
+		buildResult.phase = (String) entity.getProperty(DsKey.PHASE);
+		buildResult.status = BuildStatus.parseString((String) entity.getProperty(DsKey.STATUS));
+		timestamp = new DateTime((Date) entity.getProperty(DsKey.TIMESTAMP));
+	}
+
 	public void populateProperties(Entity entity) {
+		entity.setUnindexedProperty(DsKey.JOB_NAME, getJobName());
 		entity.setUnindexedProperty(DsKey.FULL_URL, getFullUrl());
 		entity.setProperty(DsKey.NUMBER, Integer.valueOf(getNumber()));
 		entity.setUnindexedProperty(DsKey.PHASE, getPhase());
@@ -77,7 +88,31 @@ public class JenkinsNotification {
 		entity.setProperty(DsKey.TIMESTAMP, new Date(getTimestamp().getValue()));
 	}
 
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+
+		builder.append(String.format("Job: %s\n", getJobName()));
+		builder.append(String.format("Build number: %d\n", Integer.valueOf(getNumber())));
+		builder.append(String.format("Status: %s\n", getStatus().name()));
+		builder.append(String.format("Timestamp: %s\n", timestamp.toStringRfc3339()));
+		builder.append(String.format("URL: %s", getFullUrl()));
+
+		return builder.toString();
+	}
+
+	private static int getEntityInt(String key, Entity entity, int defaultVal) {
+		Object value = entity.getProperty(key);
+		if (value != null && value instanceof Number) {
+			return ((Number) value).intValue();
+		}
+
+		return defaultVal;
+	}
+
 	public static class BuildResult {
+
+		public static final int UNKNOWN_INT = -1;
 
 		@Key(Json.FULL_URL)
 		private String fullUrl;
@@ -106,9 +141,21 @@ public class JenkinsNotification {
 		@Value
 		FAILURE,
 		;
+
+		public static BuildStatus parseString(String string) {
+			try {
+				return BuildStatus.valueOf(string);
+			}
+			catch (Exception e) {
+				// not found
+			}
+
+			return null;
+		}
 	}
 
 	public static interface DsKey {
+		public static final String JOB_NAME = "job_name";
 		public static final String FULL_URL = "full_url";
 		public static final String NUMBER = "number";
 		public static final String PHASE = "phase";

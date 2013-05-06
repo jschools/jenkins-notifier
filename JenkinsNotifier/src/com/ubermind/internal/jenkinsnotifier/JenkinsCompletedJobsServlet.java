@@ -60,11 +60,7 @@ public class JenkinsCompletedJobsServlet extends HttpServlet {
 
 		resp.setContentType(DsConst.CONTENT_TYPE_PLAINTEXT);
 		PrintWriter writer = resp.getWriter();
-		writer.printf("Job: %s\n", buildInfo.getJobName());
-		writer.printf("Build number: %d\n", Integer.valueOf(buildInfo.getNumber()));
-		writer.printf("Status: %s\n", buildInfo.getStatus().name());
-		writer.printf("Timestamp: %s\n", requestTimestamp.toStringRfc3339());
-		writer.printf("URL: %s", buildInfo.getFullUrl());
+		writer.println(buildInfo);
 
 		// get datastore
 		DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();

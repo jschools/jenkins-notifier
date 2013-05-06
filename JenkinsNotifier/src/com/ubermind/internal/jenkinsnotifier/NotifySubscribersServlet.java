@@ -13,6 +13,7 @@ import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.EntityNotFoundException;
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
+import com.ubermind.internal.jenkinsnotifier.jenkins.JenkinsNotification;
 
 @SuppressWarnings("serial")
 public class NotifySubscribersServlet extends HttpServlet {
@@ -20,16 +21,21 @@ public class NotifySubscribersServlet extends HttpServlet {
 	@Override
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
-		Key key = KeyFactory.stringToKey(req.getParameter("key"));
+		Key buildKey = KeyFactory.stringToKey(req.getParameter("key"));
+		Entity buildEntity = null;
 
 		DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
 		try {
-			Entity build = datastore.get(key);
+			buildEntity = datastore.get(buildKey);
 		}
 		catch (EntityNotFoundException e) {
 			e.printStackTrace();
 			resp.sendError(404);
 		}
+
+		JenkinsNotification buildInfo = new JenkinsNotification(buildEntity);
+		System.out.println("Found build:");
+		System.out.println(buildInfo);
 
 	}
 }
