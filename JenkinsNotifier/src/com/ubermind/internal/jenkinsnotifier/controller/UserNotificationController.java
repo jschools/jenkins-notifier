@@ -2,6 +2,8 @@ package com.ubermind.internal.jenkinsnotifier.controller;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.extensions.appengine.http.UrlFetchTransport;
@@ -24,7 +26,8 @@ public class UserNotificationController {
 			success = notifier.notifyUser(userId, buildInfo);
 		}
 		catch (Exception e) {
-			e.printStackTrace(System.err);
+			Logger.getLogger("UserNotificationController").log(Level.SEVERE, e.toString());
+			System.err.println(e.getMessage());
 		}
 
 		if (!success) {
@@ -36,8 +39,6 @@ public class UserNotificationController {
 
 		@Override
 		public boolean notifyUser(String userId, JenkinsNotification buildInfo) throws IOException {
-			System.err.println("notifying user " + userId + " of " + buildInfo.getJobName());
-
 			// get the OAuth token
 			String oauthToken = getOauthToken(userId);
 

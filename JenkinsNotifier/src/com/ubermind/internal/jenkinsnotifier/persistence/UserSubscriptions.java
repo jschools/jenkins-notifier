@@ -96,7 +96,7 @@ public class UserSubscriptions {
 		DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
 		Query query = new Query(DsConst.KIND_SUBSCRIPTION);
 		Filter jobFilter = new FilterPredicate(DsConst.PROP_JOB_NAME, FilterOperator.EQUAL, jobName);
-		Filter levelFilter = new FilterPredicate(DsConst.PROP_LEVEL, FilterOperator.LESS_THAN_OR_EQUAL, level);
+		Filter levelFilter = new FilterPredicate(DsConst.PROP_LEVEL, FilterOperator.GREATER_THAN_OR_EQUAL, level);
 		query.setFilter(new CompositeFilter(CompositeFilterOperator.AND, Arrays.asList(jobFilter, levelFilter)));
 
 		// do the query
