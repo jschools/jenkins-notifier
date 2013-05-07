@@ -24,17 +24,17 @@
 	</tr>
 <%
 	List<String> jobNames = JenkinsJobs.getAllJobs();
-	Map<String, SubscriptionLevel> userSubscriptions = UserSubscriptions.getUserSubscriptions(AuthUtil.getUserId(request));
+	Map<String, SubscriptionLevel> userSubscriptions = UserSubscriptions.getSubscriptionsForUser(AuthUtil.getUserId(request));
 	
 	final String radioSelected = " checked=\"yes\"";
 	for (String job : jobNames) {		
 		SubscriptionLevel subscriptionLevel = userSubscriptions.get(job);
 		if (subscriptionLevel == null) {
-			subscriptionLevel = SubscriptionLevel.None;
+	subscriptionLevel = SubscriptionLevel.None;
 		}
 		
 		getServletContext().setAttribute("jobName", job);
-		%>
+%>
 		<tr>
 		<td>${jobName}</td>
 		<%

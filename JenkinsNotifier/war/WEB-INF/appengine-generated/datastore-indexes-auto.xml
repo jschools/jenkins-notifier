@@ -1,4 +1,11 @@
-<!-- Indices written at Mon, 6 May 2013 17:58:38 PDT -->
+<!-- Indices written at Tue, 7 May 2013 12:03:24 PDT -->
 
-<datastore-indexes/>
+<datastore-indexes>
 
+    <!-- Used 1 time in query history -->
+    <datastore-index kind="subscription" ancestor="false" source="auto">
+        <property name="job_name" direction="asc"/>
+        <property name="level" direction="asc"/>
+    </datastore-index>
+
+</datastore-indexes>

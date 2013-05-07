@@ -13,6 +13,7 @@ import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.EntityNotFoundException;
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
+import com.ubermind.internal.jenkinsnotifier.controller.BuildNotificationController;
 import com.ubermind.internal.jenkinsnotifier.jenkins.JenkinsNotification;
 
 @SuppressWarnings("serial")
@@ -37,5 +38,6 @@ public class NotifySubscribersServlet extends HttpServlet {
 		System.out.println("Found build:");
 		System.out.println(buildInfo);
 
+		BuildNotificationController.notifySubscribedUsers(buildInfo);
 	}
 }

@@ -31,6 +31,7 @@ public class AuthFilter implements Filter {
 		Set<String> paths = new HashSet<String>();
 		paths.add("/completedBuilds");
 		paths.add("/oauth2callback");
+		paths.add("/notifySubscribers");
 		nonAuthenticatedPaths = Collections.unmodifiableSet(paths);
 	}
 

@@ -1,6 +1,7 @@
 package com.ubermind.internal.jenkinsnotifier.persistence;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -12,7 +13,14 @@ import com.google.appengine.api.datastore.FetchOptions;
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
 import com.google.appengine.api.datastore.Query;
+import com.google.appengine.api.datastore.Query.CompositeFilter;
+import com.google.appengine.api.datastore.Query.CompositeFilterOperator;
+import com.google.appengine.api.datastore.Query.Filter;
+import com.google.appengine.api.datastore.Query.FilterOperator;
+import com.google.appengine.api.datastore.Query.FilterPredicate;
 import com.google.appengine.api.datastore.Transaction;
+import com.ubermind.internal.jenkinsnotifier.jenkins.JenkinsNotification;
+import com.ubermind.internal.jenkinsnotifier.jenkins.JenkinsNotification.BuildStatus;
 import com.ubermind.internal.jenkinsnotifier.util.DatastoreUtil;
 
 public class UserSubscriptions {
@@ -44,8 +52,9 @@ public class UserSubscriptions {
 				SubscriptionLevel level = subscriptionStates.get(jobName);
 
 				Entity subscriptionEntity = new Entity(DsConst.KIND_SUBSCRIPTION, userEntity.getKey());
-				subscriptionEntity.setUnindexedProperty(DsConst.PROP_LEVEL, Integer.valueOf(level.getLevelInt()));
-				subscriptionEntity.setUnindexedProperty(DsConst.PROP_JOB_NAME, jobName);
+				subscriptionEntity.setProperty(DsConst.PROP_LEVEL, Integer.valueOf(level.getLevelInt()));
+				subscriptionEntity.setProperty(DsConst.PROP_JOB_NAME, jobName);
+				subscriptionEntity.setUnindexedProperty(DsConst.PROP_USER, userId);
 
 				datastore.put(subscriptionEntity);
 			}
@@ -62,7 +71,7 @@ public class UserSubscriptions {
 		return true;
 	}
 
-	public static Map<String, SubscriptionLevel> getUserSubscriptions(String userId) {
+	public static Map<String, SubscriptionLevel> getSubscriptionsForUser(String userId) {
 		Map<String, SubscriptionLevel> subscriptions = new HashMap<String, SubscriptionLevel>();
 
 		DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
@@ -79,6 +88,30 @@ public class UserSubscriptions {
 		return subscriptions;
 	}
 
+	public static List<String> getSubscribersForBuild(JenkinsNotification buildInfo) {
+		String jobName = buildInfo.getJobName();
+		Integer level = SubscriptionLevel.getLowestMatchingLevel(buildInfo.getStatus());
+
+		// query for subscribers with the appropriate level
+		DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
+		Query query = new Query(DsConst.KIND_SUBSCRIPTION);
+		Filter jobFilter = new FilterPredicate(DsConst.PROP_JOB_NAME, FilterOperator.EQUAL, jobName);
+		Filter levelFilter = new FilterPredicate(DsConst.PROP_LEVEL, FilterOperator.LESS_THAN_OR_EQUAL, level);
+		query.setFilter(new CompositeFilter(CompositeFilterOperator.AND, Arrays.asList(jobFilter, levelFilter)));
+
+		// do the query
+		Iterable<Entity> entities = datastore.prepare(query).asIterable();
+
+		// build the subscribers list
+		List<String> subscribers = new ArrayList<String>();
+		for (Entity entity : entities) {
+			String userId = (String) entity.getProperty(DsConst.PROP_USER);
+			subscribers.add(userId);
+		}
+
+		return subscribers;
+	}
+
 	private static Key getUserKey(String userId) {
 		return KeyFactory.createKey(DsConst.KIND_USER, userId);
 	}
@@ -87,8 +120,7 @@ public class UserSubscriptions {
 		None("Not subscribed"),
 		Error("Errors"),
 		Unstable("Unstable"),
-		Success("Successful"),
-		;
+		Success("Successful"), ;
 
 		private String title;
 
@@ -126,6 +158,26 @@ public class UserSubscriptions {
 			return SubscriptionLevel.None;
 		}
 
+		public static Integer getLowestMatchingLevel(BuildStatus status) {
+			int result;
+
+			switch (status) {
+			case FAILURE:
+				result = Error.getLevelInt();
+				break;
+			case UNSTABLE:
+				result = Unstable.getLevelInt();
+				break;
+			case SUCCESS:
+				result = Success.getLevelInt();
+				break;
+			default:
+				result = None.getLevelInt();
+			}
+
+			return Integer.valueOf(result);
+		}
+
 		public static int getCount() {
 			return values().length;
 		}
@@ -137,6 +189,7 @@ public class UserSubscriptions {
 
 		public static final String PROP_JOB_NAME = "job_name";
 		public static final String PROP_LEVEL = "level";
+		public static final String PROP_USER = "user";
 	}
 
 }

@@ -15,6 +15,7 @@ import com.google.api.client.extensions.appengine.auth.oauth2.AppEngineCredentia
 import com.google.api.client.extensions.appengine.http.UrlFetchTransport;
 import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeFlow;
 import com.google.api.client.json.jackson.JacksonFactory;
+import com.google.api.services.tasks.TasksScopes;
 
 public class AuthUtil {
 
@@ -26,7 +27,7 @@ public class AuthUtil {
 											+ "https://www.googleapis.com/auth/userinfo.profile";
 
 	private static final String TASKS_SCOPE = "https://www.googleapis.com/auth/userinfo.profile "
-											+ "https://www.googleapis.com/auth/tasks";
+											+ TasksScopes.TASKS;
 
 	/**
 	 * Creates and returns a new {@link AuthorizationCodeFlow} for this app.

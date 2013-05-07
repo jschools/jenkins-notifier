@@ -1,9 +1,12 @@
 package com.ubermind.internal.jenkinsnotifier.persistence;
 
+import java.util.logging.Logger;
+
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.Key;
+import com.google.appengine.api.datastore.KeyFactory;
 import com.ubermind.internal.jenkinsnotifier.jenkins.JenkinsNotification;
 
 public class JenkinsBuilds {
@@ -18,6 +21,8 @@ public class JenkinsBuilds {
 		Entity buildEntity = new Entity(DsConst.KIND_BUILD, jobKey);
 		buildInfo.populateProperties(buildEntity);
 		datastore.put(buildEntity);
+
+		Logger.getLogger("JenkinsBuilds").info("Build with key " + KeyFactory.keyToString(buildEntity.getKey()) + " inserted");
 
 		return buildEntity.getKey();
 	}
