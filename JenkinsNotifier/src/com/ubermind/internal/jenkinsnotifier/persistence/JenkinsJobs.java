@@ -1,11 +1,19 @@
 package com.ubermind.internal.jenkinsnotifier.persistence;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.EntityNotFoundException;
+import com.google.appengine.api.datastore.FetchOptions;
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
+import com.google.appengine.api.datastore.Query;
+import com.ubermind.internal.jenkinsnotifier.persistence.UserSubscriptions.SubscriptionLevel;
 
 
 public class JenkinsJobs {
@@ -32,6 +40,28 @@ public class JenkinsJobs {
 		}
 
 		return job.getKey();
+	}
+
+	public static List<String> getAllJobs() {
+		List<String> jobs = new ArrayList<String>();
+
+		DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
+		Query query = new Query(DsConst.KIND_JOB, getAllJobsKey());
+
+		List<Entity> result = datastore.prepare(query).asList(FetchOptions.Builder.withDefaults());
+		for (Entity e : result) {
+			jobs.add((String) e.getProperty(DsConst.PROP_JOB_NAME));
+		}
+
+		return jobs;
+	}
+
+	public static Map<String, SubscriptionLevel> getSubscribedJobsForUser() {
+		Map<String, SubscriptionLevel> result = new HashMap<String, SubscriptionLevel>();
+
+		result.put("JenkinsNotifier.TestJob2", SubscriptionLevel.Success);
+
+		return result;
 	}
 
 	static Key getJobKey(String jobName) {

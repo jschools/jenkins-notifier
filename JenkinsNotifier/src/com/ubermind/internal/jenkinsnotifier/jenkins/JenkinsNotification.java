@@ -6,6 +6,7 @@ import com.google.api.client.util.DateTime;
 import com.google.api.client.util.Key;
 import com.google.api.client.util.Value;
 import com.google.appengine.api.datastore.Entity;
+import com.ubermind.internal.jenkinsnotifier.util.DatastoreUtil;
 
 public class JenkinsNotification {
 
@@ -73,7 +74,7 @@ public class JenkinsNotification {
 		this.jobName = (String) entity.getProperty(DsKey.JOB_NAME);
 		buildResult = new BuildResult();
 		buildResult.fullUrl = (String) entity.getProperty(DsKey.FULL_URL);
-		buildResult.number = getEntityInt(DsKey.NUMBER, entity, BuildResult.UNKNOWN_INT);
+		buildResult.number = DatastoreUtil.getEntityPropertyInt(entity, DsKey.NUMBER, BuildResult.UNKNOWN_INT);
 		buildResult.phase = (String) entity.getProperty(DsKey.PHASE);
 		buildResult.status = BuildStatus.parseString((String) entity.getProperty(DsKey.STATUS));
 		timestamp = new DateTime((Date) entity.getProperty(DsKey.TIMESTAMP));
@@ -99,15 +100,6 @@ public class JenkinsNotification {
 		builder.append(String.format("URL: %s", getFullUrl()));
 
 		return builder.toString();
-	}
-
-	private static int getEntityInt(String key, Entity entity, int defaultVal) {
-		Object value = entity.getProperty(key);
-		if (value != null && value instanceof Number) {
-			return ((Number) value).intValue();
-		}
-
-		return defaultVal;
 	}
 
 	public static class BuildResult {

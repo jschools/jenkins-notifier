@@ -24,6 +24,15 @@ http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
 	</servlet-mapping>
 
 	<servlet>
+		<servlet-name>userSubscriptions</servlet-name>
+		<servlet-class>com.ubermind.internal.jenkinsnotifier.UserSubscriptionsServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>userSubscriptions</servlet-name>
+		<url-pattern>/userSubscriptions</url-pattern>
+	</servlet-mapping>
+	
+	<servlet>
 		<servlet-name>completedBuilds</servlet-name>
 		<servlet-class>com.ubermind.internal.jenkinsnotifier.CompletedBuildsServlet</servlet-class>
 	</servlet>
@@ -51,6 +60,6 @@ http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
 	</servlet-mapping>
 
 	<welcome-file-list>
-		<welcome-file>index.html</welcome-file>
+		<welcome-file>jobs.jsp</welcome-file>
 	</welcome-file-list>
 </web-app>

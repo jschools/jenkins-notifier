@@ -16,6 +16,5 @@ public class SignOutServlet extends HttpServlet {
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		AuthUtil.logOut(req);
 		resp.getWriter().write("You have been signed out.");
-
 	}
 }
