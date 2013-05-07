@@ -19,11 +19,16 @@ public class UserNotificationController {
 	private static final UserBuildNotifier notifier = new TasksNotifier();
 
 	public static void notifyUserOfBuild(String userId, JenkinsNotification buildInfo) {
+		boolean success = false;
 		try {
-			notifier.notifyUser(userId, buildInfo);
+			success = notifier.notifyUser(userId, buildInfo);
 		}
 		catch (Exception e) {
-			e.printStackTrace();
+			e.printStackTrace(System.err);
+		}
+
+		if (!success) {
+			System.err.println("error notifying user");
 		}
 	}
 
@@ -31,11 +36,15 @@ public class UserNotificationController {
 
 		@Override
 		public boolean notifyUser(String userId, JenkinsNotification buildInfo) throws IOException {
+			System.err.println("notifying user " + userId + " of " + buildInfo.getJobName());
+
 			// get the OAuth token
 			String oauthToken = getOauthToken(userId);
 
 			// get the Tasks Service
-			Tasks tasksService = new Tasks.Builder(new UrlFetchTransport(), new JacksonFactory(), null).build();
+			Tasks tasksService = new Tasks.Builder(new UrlFetchTransport(), new JacksonFactory(), null)
+				.setApplicationName("Jenkins Notifier")
+				.build();
 
 			// get the user's task lists
 			TaskLists listsResponse = tasksService.tasklists().list()
@@ -79,6 +88,9 @@ public class UserNotificationController {
 
 		private static String getOauthToken(String userId) throws IOException {
 			Credential credential = AuthUtil.getCredential(userId);
+			if (credential.getExpiresInSeconds().longValue() < 60) {
+				credential.refreshToken();
+			}
 
 			return credential.getAccessToken();
 		}

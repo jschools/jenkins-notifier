@@ -70,6 +70,17 @@ public class JenkinsNotification {
 		this.timestamp = timestamp;
 	}
 
+	public boolean isValid() {
+		boolean isValid = true;
+
+		isValid &= jobName != null && !jobName.isEmpty();
+		isValid &= buildResult.number != BuildResult.UNKNOWN_INT;
+		isValid &= buildResult.phase != null && buildResult.phase.equals("COMPLETED");
+		isValid &= buildResult.status != null;
+
+		return isValid;
+	}
+
 	public JenkinsNotification(Entity entity) {
 		this.jobName = (String) entity.getProperty(DsKey.JOB_NAME);
 		buildResult = new BuildResult();
@@ -95,8 +106,8 @@ public class JenkinsNotification {
 
 		builder.append(String.format("Job: %s\n", getJobName()));
 		builder.append(String.format("Build number: %d\n", Integer.valueOf(getNumber())));
-		builder.append(String.format("Status: %s\n", getStatus().name()));
-		builder.append(String.format("Timestamp: %s\n", timestamp.toStringRfc3339()));
+		builder.append(String.format("Status: %s\n", getStatus() != null ? getStatus().name() : "<null>"));
+		builder.append(String.format("Timestamp: %s\n", timestamp != null ? timestamp.toStringRfc3339() : "<null>"));
 		builder.append(String.format("URL: %s", getFullUrl()));
 
 		return builder.toString();
@@ -110,7 +121,7 @@ public class JenkinsNotification {
 		private String fullUrl;
 
 		@Key(Json.NUMBER)
-		private int number;
+		private int number = UNKNOWN_INT;
 
 		@Key(Json.PHASE)
 		private String phase;

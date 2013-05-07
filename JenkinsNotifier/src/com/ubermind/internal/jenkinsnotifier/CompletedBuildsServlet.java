@@ -3,7 +3,6 @@ package com.ubermind.internal.jenkinsnotifier;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Date;
-import java.util.logging.Logger;
 
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -20,20 +19,32 @@ public class CompletedBuildsServlet extends HttpServlet {
 
 	@Override
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-		Logger.getLogger(getServletName()).info("CompletedBuildsServlet.doPost()");
-
 		DateTime requestTimestamp = new DateTime(new Date().getTime(), 0);
+
+//		// uncomment these and the line below to dump POST body to stderr
+//		StringBuffer out = new StringBuffer(64);
+//		StringBufferOutputStream os = new StringBufferOutputStream(out);
+//		IOUtils.copy(req.getInputStream(), os);
+//		String body = out.toString();
+//		System.err.println(body);
 
 		JsonFactory f = new JacksonFactory();
 		JenkinsNotification buildInfo = f.fromReader(req.getReader(), JenkinsNotification.class);
+//		JenkinsNotification buildInfo = f.fromString(body, JenkinsNotification.class);
 		buildInfo.setTimestamp(requestTimestamp);
 
 		resp.setContentType("text/plain");
-		PrintWriter writer = resp.getWriter();
-		writer.println(buildInfo);
 
-		// call the controller
-		BuildsController.onBuildInfoPosted(buildInfo);
+		if (buildInfo.isValid()) {
+			PrintWriter writer = resp.getWriter();
+			writer.println(buildInfo);
+
+			// call the controller
+			BuildsController.onBuildInfoPosted(buildInfo);
+		}
+		else {
+			resp.getWriter().println("invalid build JSON");
+		}
 	}
 
 

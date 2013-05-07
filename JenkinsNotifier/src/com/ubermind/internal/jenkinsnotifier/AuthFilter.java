@@ -44,12 +44,12 @@ public class AuthFilter implements Filter {
 			HttpServletRequest httpRequest = (HttpServletRequest) request;
 			HttpServletResponse httpResponse = (HttpServletResponse) response;
 
-			// Redirect to https when on App Engine since subscriptions only work over https
-			if (httpRequest.getServerName().contains("appspot.com") && httpRequest.getScheme().equals("http")) {
-
-				httpResponse.sendRedirect(httpRequest.getRequestURL().toString().replaceFirst("http", "https"));
-				return;
-			}
+//			// Redirect to https when on App Engine since subscriptions only work over https
+//			if (httpRequest.getServerName().contains("appspot.com") && httpRequest.getScheme().equals("http")) {
+//
+//				httpResponse.sendRedirect(httpRequest.getRequestURL().toString().replaceFirst("http", "https"));
+//				return;
+//			}
 
 			// Are we in the middle of an auth flow? IF so skip check.
 			if (nonAuthenticatedPaths.contains(httpRequest.getRequestURI())) {
