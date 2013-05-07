@@ -24,9 +24,11 @@ public class AuthUtil {
 	@SuppressWarnings("unused")
 	private static final String GLASS_SCOPE = "https://www.googleapis.com/auth/glass.timeline "
 											+ "https://www.googleapis.com/auth/glass.location "
+											+ "https://www.googleapis.com/auth/userinfo.email "
 											+ "https://www.googleapis.com/auth/userinfo.profile";
 
 	private static final String TASKS_SCOPE = "https://www.googleapis.com/auth/userinfo.profile "
+											+ "https://www.googleapis.com/auth/userinfo.email "
 											+ TasksScopes.TASKS;
 
 	/**

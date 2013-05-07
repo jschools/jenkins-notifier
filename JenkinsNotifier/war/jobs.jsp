@@ -1,3 +1,8 @@
+<%@page import="com.google.api.client.json.jackson2.JacksonFactory"%>
+<%@page import="com.google.api.client.extensions.appengine.http.UrlFetchTransport"%>
+<%@page import="com.google.api.services.oauth2.model.Userinfo"%>
+<%@page import="com.google.api.services.oauth2.Oauth2"%>
+<%@page import="com.google.api.services.oauth2.Oauth2.Builder"%>
 <%@page import="com.ubermind.internal.jenkinsnotifier.persistence.UserSubscriptions"%>
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1" pageEncoding="ISO-8859-1"%>
 <%@ page import="java.util.List" %>
@@ -13,7 +18,6 @@
 <title>JenkinsNotifier | Jenkins Jobs</title>
 </head>
 <body>
-
 <h1>Jenkins Jobs:</h1>
 
 <form method="post" action="userSubscriptions">
@@ -63,6 +67,12 @@
 <p>${flashMessage}</p>
 <br />
 <hr />
+<%
+	Oauth2 oauthService = new Oauth2.Builder(new UrlFetchTransport(), new JacksonFactory(), null).setApplicationName("Jenkins Notifier").build();
+	Userinfo userInfo = oauthService.userinfo().get().setFields("email").setOauthToken(AuthUtil.getCredential(request).getAccessToken()).execute();
+	getServletContext().setAttribute("email", userInfo.getEmail());
+%>
+<p>Logged in as ${email}</p>
 <a href="/signout">Log out</a>
 
 </body>
