@@ -59,7 +59,7 @@ public class AuthServlet extends HttpServlet {
 
 		AuthorizationCodeFlow flow = AuthUtil.newAuthorizationCodeFlow();
 		GenericUrl url = flow.newAuthorizationUrl().setRedirectUri(WebUtil.buildUrl(req, "/oauth2callback"));
-		url.set("approval_prompt", "force");
+		url.set("approval_prompt", "auto");
 		res.sendRedirect(url.build());
 	}
 
