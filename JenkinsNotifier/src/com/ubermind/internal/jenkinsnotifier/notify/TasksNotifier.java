@@ -3,7 +3,6 @@ package com.ubermind.internal.jenkinsnotifier.notify;
 import java.io.IOException;
 import java.util.List;
 
-import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.extensions.appengine.http.UrlFetchTransport;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.services.tasks.Tasks;
@@ -19,7 +18,7 @@ public class TasksNotifier implements UserBuildNotifier {
 	@Override
 	public boolean notifyUser(String userId, JenkinsNotification buildInfo) throws IOException {
 		// get the OAuth token
-		String oauthToken = getOauthToken(userId);
+		String oauthToken = AuthUtil.getOauthToken(userId);
 
 		// get the Tasks Service
 		Tasks tasksService = new Tasks.Builder(new UrlFetchTransport(), new JacksonFactory(), null)
@@ -64,15 +63,6 @@ public class TasksNotifier implements UserBuildNotifier {
 				.execute();
 
 		return insertResponse != null;
-	}
-
-	private static String getOauthToken(String userId) throws IOException {
-		Credential credential = AuthUtil.getCredential(userId);
-		if (credential.getExpiresInSeconds().longValue() < 60) {
-			credential.refreshToken();
-		}
-
-		return credential.getAccessToken();
 	}
 
 }

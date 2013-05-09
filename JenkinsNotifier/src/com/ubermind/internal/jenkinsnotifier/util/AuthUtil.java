@@ -21,15 +21,11 @@ public class AuthUtil {
 
 	private static final String OAUTH_PLIST_FILE = "oauth.properties";
 
-	@SuppressWarnings("unused")
-	private static final String GLASS_SCOPE = "https://www.googleapis.com/auth/glass.timeline "
-											+ "https://www.googleapis.com/auth/glass.location "
-											+ "https://www.googleapis.com/auth/userinfo.email "
-											+ "https://www.googleapis.com/auth/userinfo.profile";
-
-	private static final String TASKS_SCOPE = "https://www.googleapis.com/auth/userinfo.profile "
-											+ "https://www.googleapis.com/auth/userinfo.email "
-											+ TasksScopes.TASKS;
+	private static final String SCOPE = "https://www.googleapis.com/auth/glass.timeline "
+									  + "https://www.googleapis.com/auth/glass.location "
+									  + "https://www.googleapis.com/auth/userinfo.profile "
+									  + "https://www.googleapis.com/auth/userinfo.email "
+									  + TasksScopes.TASKS;
 
 	/**
 	 * Creates and returns a new {@link AuthorizationCodeFlow} for this app.
@@ -43,7 +39,7 @@ public class AuthUtil {
 		String clientSecret = authProperties.getProperty("client_secret");
 
 		return new GoogleAuthorizationCodeFlow.Builder(new UrlFetchTransport(), new JacksonFactory(), clientId, clientSecret,
-				Collections.singleton(TASKS_SCOPE)).setAccessType("offline").setCredentialStore(getCredentialStore()).build();
+				Collections.singleton(SCOPE)).setAccessType("offline").setCredentialStore(getCredentialStore()).build();
 	}
 
 	/**
@@ -93,5 +89,14 @@ public class AuthUtil {
 
 	public interface SessionVars {
 		public static final String USER_ID = "userId";
+	}
+
+	public static String getOauthToken(String userId) throws IOException {
+		Credential credential = getCredential(userId);
+		if (credential.getExpiresInSeconds().longValue() < 60) {
+			credential.refreshToken();
+		}
+
+		return credential.getAccessToken();
 	}
 }

@@ -34,7 +34,7 @@
 	for (String job : jobNames) {		
 		SubscriptionLevel subscriptionLevel = userSubscriptions.get(job);
 		if (subscriptionLevel == null) {
-	subscriptionLevel = SubscriptionLevel.None;
+			subscriptionLevel = SubscriptionLevel.None;
 		}
 		
 		getServletContext().setAttribute("jobName", job);
@@ -69,7 +69,7 @@
 <hr />
 <%
 	Oauth2 oauthService = new Oauth2.Builder(new UrlFetchTransport(), new JacksonFactory(), null).setApplicationName("Jenkins Notifier").build();
-	Userinfo userInfo = oauthService.userinfo().get().setFields("email").setOauthToken(AuthUtil.getCredential(request).getAccessToken()).execute();
+	Userinfo userInfo = oauthService.userinfo().get().setFields("email").setOauthToken(AuthUtil.getOauthToken(AuthUtil.getUserId(request))).execute();
 	getServletContext().setAttribute("email", userInfo.getEmail());
 %>
 <p>Logged in as ${email}</p>

@@ -4,12 +4,12 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.ubermind.internal.jenkinsnotifier.jenkins.JenkinsNotification;
-import com.ubermind.internal.jenkinsnotifier.notify.TasksNotifier;
+import com.ubermind.internal.jenkinsnotifier.notify.GlassNotifier;
 import com.ubermind.internal.jenkinsnotifier.notify.UserBuildNotifier;
 
 public class UserNotificationController {
 
-	private static final UserBuildNotifier notifier = new TasksNotifier();
+	private static final UserBuildNotifier notifier = new GlassNotifier();
 
 	public static void notifyUserOfBuild(String userId, JenkinsNotification buildInfo) {
 		boolean success = false;
